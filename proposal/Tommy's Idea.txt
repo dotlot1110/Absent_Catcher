@@ -1,0 +1,38 @@
+1) Start the Server with:
+python server.py
+
+2) Start the Client with
+python client.py
+
+3) When you run the client, you'll see:
+=== Attendance Verification System ===
+Enter student ID:
+
+4)  Enter your details when prompted:
+        Student ID (e.g., "12345")
+        Classroom ID (e.g., "classroom_1")
+
+    The system will then:
+        Capture nearby Wi-Fi packets, send the data to the server, show the verification result
+
+
+Example:
+
+Enter student ID: 12345
+Enter classroom ID: classroom_1
+Starting packet capture...
+Captured MAC: 00:11:22:33:44:55
+Attendance verified successfully! ✅
+
+Current Issue:
+
+=== Attendance Verification System ===
+Enter student ID: 44444
+Enter classroom ID (e.g., classroom_1): classroom_1
+Starting attendance submission process...
+Starting packet capture...
+Error during packet capture: [Errno 1] Operation not permitted
+Capture complete. Found 0 unique MACs
+Sending data to server...
+Attendance verification result: False
+❌ Attendance verification failed!
