@@ -1,8 +1,0 @@
-# https://github.com/zed-industries/zed/blob/main/docs/src/languages/python.md
-# Under "Virtual environments"
-
-# pip install -r requirements.txt
-
-flask
-scapy
-requests
