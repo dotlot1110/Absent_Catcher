@@ -1,0 +1,35 @@
+from fastapi import FastAPI
+from .constant.database import DATABASE
+from .router.app_router import app_router
+import aiosqlite
+from contextlib import asynccontextmanager
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await initialize_database()
+    yield
+
+async def initialize_database():
+    async with aiosqlite.connect(DATABASE) as db:
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS attendance (
+                student_id TEXT PRIMARY KEY,
+                attendance_verified BOOLEAN,
+                timestamp TEXT
+            )
+        """)
+        await db.commit()
+
+
+app = FastAPI(lifespan=lifespan)
+app.include_router(app_router)
+
+def run_server():
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=5000)
+
+if __name__ == "__main__":
+    run_server()
+
+

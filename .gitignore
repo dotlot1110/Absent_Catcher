@@ -1,2 +1,4 @@
 .absentCatchers
 .ropeproject
+.venv
+__pycache__
