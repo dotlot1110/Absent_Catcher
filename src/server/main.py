@@ -19,6 +19,13 @@ async def initialize_database():
                 timestamp TEXT
             )
         """)
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS valid_ap_macs (
+                classroom_id TEXT,
+                mac_address TEXT,
+                PRIMARY KEY (classroom_id, mac_address)
+            )
+        """)
         await db.commit()
 
 
