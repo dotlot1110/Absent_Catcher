@@ -1,37 +1,54 @@
-from scapy.all import sniff
-from scapy.layers.dot11 import Dot11
+from getmac import get_mac_address
+import netifaces
 import requests
 from datetime import datetime
+import os
 
 SERVER_URL = 'https://staging.api.blccu.com'
 
-def capture_wifi_packets(duration=10):
+def capture_wifi_packets(duration=10, interface="en0"):
     captured_macs = set()
+    
+    # macOS에서는 모니터 모드 설정이 다름
+    try:
+        print(f"Using interface: {interface}")
+        # macOS에서는 airport 유틸리티 사용
+        airport_path = "/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport"
+        os.system(f"sudo {airport_path} {interface} sniff")
+        
+        print(f"Interface {interface} ready for capture")
+    except Exception as e:
+        print(f"Error setting interface: {str(e)}")
+        return []
 
-    def packet_handler(pkt):
-        if pkt.haslayer(Dot11):
-            # Extract MAC addresses from Wi-Fi packets
-            mac = None
-
-            # Try to get MAC from different fields
-            if pkt.addr2:  # Source MAC
-                mac = pkt.addr2
-            elif pkt.addr1:  # Destination MAC
-                mac = pkt.addr1
-            elif pkt.addr3:  # BSSID
-                mac = pkt.addr3
-
+    # 모든 네트워크 인터페이스 가져오기
+    interfaces = netifaces.interfaces()
+    
+    print("Scanning network interfaces...")
+    for interface in interfaces:
+        try:
+            # 각 인터페이스의 연결된 장치들의 MAC 주소 수집
+            mac = get_mac_address(interface=interface)
             if mac:
-                # Convert MAC to a standardized format
                 mac = mac.lower()
                 captured_macs.add(mac)
-                print(f"Captured MAC: {mac}")  # Debug print
-
-    print("Starting packet capture...")
-    try:
-        sniff(prn=packet_handler, timeout=duration)
-    except Exception as e:
-        print(f"Error during packet capture: {str(e)}")
+                print(f"Captured MAC from {interface}: {mac}")
+                
+            # 인터페이스의 IP 주소들 확인
+            addrs = netifaces.ifaddresses(interface)
+            if netifaces.AF_INET in addrs:  # IPv4 주소가 있는 경우
+                for addr in addrs[netifaces.AF_INET]:
+                    ip = addr['addr']
+                    # IP에 연결된 장치의 MAC 주소 확인
+                    mac = get_mac_address(ip=ip)
+                    if mac:
+                        mac = mac.lower()
+                        captured_macs.add(mac)
+                        print(f"Captured MAC from IP {ip}: {mac}")
+                    
+        except Exception as e:
+            print(f"Error scanning interface {interface}: {str(e)}")
+            continue
 
     print(f"Capture complete. Found {len(captured_macs)} unique MACs")
     return list(captured_macs)
@@ -50,14 +67,11 @@ def submit_attendance(student_id, classroom_id):
         'timestamp': datetime.now().isoformat()
     }
 
-    # URL
-    URL = SERVER_URL + "/verify-attendance"
-
     # Send request to server
     try:
         print("Sending data to server...")
         response = requests.post(
-            url=URL,
+            url=SERVER_URL + "/verify-attendance",
             json=data,
             headers={'Content-Type': 'application/json'}
         )
@@ -88,7 +102,6 @@ def check_attendance_list():
     except Exception as e:
         print(f"Error during attendance list check: {str(e)}")
 
-
 def main():
     print("=== Attendance Verification System ===")
     print("Enter the wanted process:")
@@ -105,3 +118,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
