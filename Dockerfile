@@ -9,10 +9,10 @@ RUN pip install poetry
 ENV POETRY_VIRTUALENVS_CREATE=false
 
 # 프로젝트 파일 복사
-COPY pyproject.toml poetry.lock* ./
+COPY pyproject-docker.toml pyproject.toml
 
 # 의존성 설치
-RUN poetry install --no-root --no-dev
+RUN poetry install --no-root --no-dev 
 
 # 소스 코드 복사
 COPY ./src ./src

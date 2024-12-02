@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "absent-catcher"
+version = "0.1.0"
+description = ""
+authors = ["do-huni <orangnlp@gmail.com>"]
+readme = "README.md"
+packages = [
+    { include = "src" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+scapy = "^2.6.1"
+requests = "^2.32.3"
+uvicorn = "^0.32.1"
+fastapi = "^0.115.5"
+aiosqlite = "^0.20.0"
+
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+
+start-client = "src.client.main:main"
+start-server = "src.server.main:run_server"
