@@ -14,9 +14,10 @@ async def initialize_database():
     async with aiosqlite.connect(DATABASE) as db:
         await db.execute("""
             CREATE TABLE IF NOT EXISTS attendance (
-                student_id TEXT PRIMARY KEY,
+                student_id TEXT,
                 attendance_verified BOOLEAN,
-                timestamp TEXT
+                timestamp TEXT,
+                PRIMARY KEY (student_id, timestamp)
             )
         """)
         await db.execute("""

@@ -8,18 +8,6 @@ SERVER_URL = 'https://staging.api.blccu.com'
 
 def capture_wifi_packets(duration=10, interface="en0"):
     captured_macs = set()
-    
-    # macOS에서는 모니터 모드 설정이 다름
-    try:
-        print(f"Using interface: {interface}")
-        # macOS에서는 airport 유틸리티 사용
-        airport_path = "/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport"
-        os.system(f"sudo {airport_path} {interface} sniff")
-        
-        print(f"Interface {interface} ready for capture")
-    except Exception as e:
-        print(f"Error setting interface: {str(e)}")
-        return []
 
     # 모든 네트워크 인터페이스 가져오기
     interfaces = netifaces.interfaces()
@@ -58,13 +46,13 @@ def submit_attendance(student_id, classroom_id):
 
     # Capture Wi-Fi packets
     captured_macs = capture_wifi_packets()
+    print(f"Captured MACs: {captured_macs}")
 
     # Prepare data for server
     data = {
         'student_id': student_id,
         'captured_macs': captured_macs,
         'classroom_id': classroom_id,
-        'timestamp': datetime.now().isoformat()
     }
 
     # Send request to server
@@ -102,6 +90,7 @@ def check_attendance_list():
     except Exception as e:
         print(f"Error during attendance list check: {str(e)}")
 
+
 def main():
     print("=== Attendance Verification System ===")
     print("Enter the wanted process:")
@@ -111,6 +100,13 @@ def main():
 
     if process == "1":
         student_id = input("Enter student ID: ")
+        response = requests.get(url=SERVER_URL + "/valid-macs", headers={'Content-Type': 'application/json'})
+        result = response.json()
+        # 교실 목록을 번호와 함께 예쁘게 출력
+        print("\nClassrooms:")
+        for idx, classroom in enumerate(result.keys(), 1):
+            print(f"- {classroom}")
+        print()  # 빈 줄 추가로 가독성 향상
         classroom_id = input("Enter classroom ID (e.g., classroom_1): ")
         submit_attendance(student_id, classroom_id)
     elif process == "2":
