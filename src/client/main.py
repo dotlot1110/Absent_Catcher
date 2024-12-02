@@ -86,7 +86,9 @@ def check_attendance_list():
         print("Printing attendance list:")
         for attendance in result:
             print(f"Student ID: {attendance['student_id']:<15} "
-                  f"Timestamp: {attendance['timestamp']}")
+                  f"Timestamp: {attendance['timestamp']}\t"
+                  f"Attendance Verified: {attendance['attendance_verified']}")
+
     except Exception as e:
         print(f"Error during attendance list check: {str(e)}")
 
@@ -102,7 +104,6 @@ def main():
         student_id = input("Enter student ID: ")
         response = requests.get(url=SERVER_URL + "/valid-macs", headers={'Content-Type': 'application/json'})
         result = response.json()
-        print(result)
         print("\nClassrooms:")
         for idx, classroom in enumerate(result['classrooms'].keys(), 1):
             print(f"- {classroom}")
