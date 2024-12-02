@@ -102,11 +102,11 @@ def main():
         student_id = input("Enter student ID: ")
         response = requests.get(url=SERVER_URL + "/valid-macs", headers={'Content-Type': 'application/json'})
         result = response.json()
-        # 교실 목록을 번호와 함께 예쁘게 출력
+        print(result)
         print("\nClassrooms:")
-        for idx, classroom in enumerate(result.keys(), 1):
+        for idx, classroom in enumerate(result['classrooms'].keys(), 1):
             print(f"- {classroom}")
-        print()  # 빈 줄 추가로 가독성 향상
+        print()  # 가독성을 위한 빈 줄 추가
         classroom_id = input("Enter classroom ID (e.g., classroom_1): ")
         submit_attendance(student_id, classroom_id)
     elif process == "2":
